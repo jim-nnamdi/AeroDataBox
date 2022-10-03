@@ -89,12 +89,13 @@ pub struct FlightData{
     status: String,
 }
 
-pub fn flight() -> Result<Response, String>{
+#[tokio::main]
+pub async fn flight() -> Result<(), String>{
 
     const API_KEY: &str = "53fd0041f2msh8c3ffa5b5508be0p152202jsn9a0f742df4a8";
     const API_HOST : &str = "aerodatabox.p.rapidapi.com";
 
-    let aerobox_client = Client::new();
+    let aerobox_client = reqwest::Client::new();
     let formatted_err_msg = format!(
         "[AERODATABOX ERROR]: Error making GET request to url: {}",
         API_HOST.to_string()
@@ -104,18 +105,20 @@ pub fn flight() -> Result<Response, String>{
     .header("X-RapidAPI-Key", API_KEY)
     .header("X-RapidAPI-Host",API_HOST )
     .send()
-    .expect(formatted_err_msg.as_str());
+    .await?
+    .text()
+    .await?;
 
-    // println!("{:?}",flight_status_request);
+    println!("{:?}",flight_status_request);
     match flight_status_request.status(){
-        StatusCode::OK => return Ok(flight_status_request),
+        StatusCode::OK => Ok(()),
         StatusCode::BAD_REQUEST => return Err("Please try again".to_string()),
         StatusCode::INTERNAL_SERVER_ERROR => {
             return Err("An error occurred on AeroBox server, please try again".to_string())
         }
         _ => {
             println!("response from base is {:?}", flight_status_request);
-            return Ok(flight_status_request);
+            return Ok(());
         }
     }
 }
