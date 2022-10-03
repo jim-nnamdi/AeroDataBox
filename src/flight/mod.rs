@@ -1,11 +1,7 @@
 // use reqwest::blocking::{Error};
 use chrono::{DateTime, Local};
 
-use reqwest::{
-    blocking::{Client, Response},
-    StatusCode,
-};
-
+use reqwest::{self};
 use serde::{Serialize, Deserialize};
 
 #[derive(Debug,Serialize,Deserialize)]
@@ -90,35 +86,21 @@ pub struct FlightData{
 }
 
 #[tokio::main]
-pub async fn flight() -> Result<(), String>{
+pub async fn flight() -> Result<(), reqwest::Error>{
 
     const API_KEY: &str = "53fd0041f2msh8c3ffa5b5508be0p152202jsn9a0f742df4a8";
     const API_HOST : &str = "aerodatabox.p.rapidapi.com";
 
     let aerobox_client = reqwest::Client::new();
-    let formatted_err_msg = format!(
-        "[AERODATABOX ERROR]: Error making GET request to url: {}",
-        API_HOST.to_string()
-    );
 
-    let flight_status_request = aerobox_client.get("https://aerodatabox.p.rapidapi.com/flights/number/KL1395/2022-09-30")
+    let flight_status_request: Vec<FlightData> = aerobox_client.get("https://aerodatabox.p.rapidapi.com/flights/number/KL1395/2022-09-30")
     .header("X-RapidAPI-Key", API_KEY)
     .header("X-RapidAPI-Host",API_HOST )
     .send()
     .await?
-    .text()
+    .json()
     .await?;
 
     println!("{:?}",flight_status_request);
-    match flight_status_request.status(){
-        StatusCode::OK => Ok(()),
-        StatusCode::BAD_REQUEST => return Err("Please try again".to_string()),
-        StatusCode::INTERNAL_SERVER_ERROR => {
-            return Err("An error occurred on AeroBox server, please try again".to_string())
-        }
-        _ => {
-            println!("response from base is {:?}", flight_status_request);
-            return Ok(());
-        }
-    }
+    Ok(())
 }
