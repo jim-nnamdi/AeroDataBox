@@ -1,4 +1,5 @@
 mod flight;
+
 pub mod prelude{
-    pub use crate::flight::status::*;
+    pub use crate::flight::status;
 }

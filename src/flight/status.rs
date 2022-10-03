@@ -1,5 +1,5 @@
 
-    use chrono::{DateTime, Local, NaiveDateTime};
+    use chrono::{ NaiveDateTime};
 
     use reqwest::{self};
     use serde::{Serialize, Deserialize};

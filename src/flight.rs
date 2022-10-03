@@ -1,16 +1,17 @@
 pub mod status;
 
-use chrono::{DateTime, NaiveDateTime, NaiveDate, NaiveTime};
+use chrono::{NaiveDateTime, NaiveDate, NaiveTime};
 use status::FlightData;
 
 use self::status::{Aircraft, Airline, Arrival, Airport, Location, Quality};
 
 pub struct Flight {
-    pub status: FlightData
+    pub status: FlightData,
 }
 
 impl Flight{
-    fn new(&self) -> Flight{
+    #[allow(dead_code)]
+    pub fn new(&self) -> Flight{
         let flight_info = 
         Flight {
             status: FlightData { 
@@ -56,5 +57,14 @@ impl Flight{
     };
 
     flight_info
+  }
+
+  #[allow(dead_code)]
+  pub fn get_information()-> Result<(), reqwest::Error>{
+    let f_info = FlightData::flight_information();
+    match f_info{
+        Err(e) => Err(e),
+        _ => Ok(())
+    }
   }
 }
