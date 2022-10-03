@@ -1,49 +1,56 @@
-use std::fs::rename;
-
 // use reqwest::blocking::{Error};
 use chrono::{DateTime, Local};
+
+use reqwest::{
+    blocking::{Client, Response},
+    StatusCode,
+};
 
 use serde::{Serialize, Deserialize};
 
 #[derive(Debug,Serialize,Deserialize)]
-struct Aircraft{
+pub struct Aircraft{
     model: String,
     reg: String,
 }
 
 #[derive(Debug,Serialize,Deserialize)]
-struct Airline{
+pub struct Airline{
     name: String
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-struct Location{
+pub struct Location{
     lat : f64,
     lon: f64,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-struct Airport{
-    countryCode:String,
+pub struct Airport{
+    #[serde(rename="countryCode")]
+    country_code:String,
+
     iata:String,
     icao:String,
     location:Location,
-    municipalityName:String,
+
+    #[serde(rename="municipalityName")]
+    municipality_name:String,
+
     name:String,
-    shortName:String
+
+    #[serde(rename="shortName")]
+    short_name:String
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-struct Quality {
-    #[serde = rename(0)]
+pub struct Quality {
     basic: String,
-
-    #[serde=rename(1)]
     live: String
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-struct Arrival {
+pub struct Arrival {
     #[serde(rename="actualTimeLocal")]
     actual_time_local: Option<DateTime<Local>>,
 
@@ -51,45 +58,64 @@ struct Arrival {
     actual_time_utc : Option<DateTime<Local>>,
 
     airport: Airport,
-    baggageBelt: String,
+
+    #[serde(rename="baggageBelt")]
+    baggage_belt: String,
     gate: String,
     quality:Vec<Quality>,
-    scheduledTimeLocal: Option<DateTime<Local>>,
-    scheduledTimeUTC: Option<DateTime<Local>>,
+
+    #[serde(rename="scheduledTimeLocal")]
+    scheduled_time_local: Option<DateTime<Local>>,
+
+    #[serde(rename="scheduledTimeUTC")]
+    scheduled_time_utc: Option<DateTime<Local>>,
     terminal: String,
 }
 
 #[derive(Debug,Serialize,Deserialize)]
-struct FlightData{
+pub struct FlightData{
     aircraft: Aircraft,
     airline: Airline,
     arrival: Arrival,
-    
+
     #[serde(rename="camelcase")]
     callsign: String,
 
     #[serde(rename="codeshareStatus")]
     code_share_status: String,
-    isCargo: bool,
+
+    #[serde(rename="isCargo")]
+    is_cargo: bool,
     status: String,
 }
 
-#[tokio::main]
-pub async fn flight() -> Result<(), reqwest::Error>{
+pub fn flight() -> Result<Response, String>{
 
     const API_KEY: &str = "53fd0041f2msh8c3ffa5b5508be0p152202jsn9a0f742df4a8";
     const API_HOST : &str = "aerodatabox.p.rapidapi.com";
 
-    let aerobox_client = reqwest::Client::new();
+    let aerobox_client = Client::new();
+    let formatted_err_msg = format!(
+        "[AERODATABOX ERROR]: Error making GET request to url: {}",
+        API_HOST.to_string()
+    );
 
     let flight_status_request = aerobox_client.get("https://aerodatabox.p.rapidapi.com/flights/number/KL1395/2022-09-30")
     .header("X-RapidAPI-Key", API_KEY)
     .header("X-RapidAPI-Host",API_HOST )
     .send()
-    .await?
-    .text()
-    .await?;
+    .expect(formatted_err_msg.as_str());
 
-    println!("{:#?}", flight_status_request);
-    Ok(())
+    // println!("{:?}",flight_status_request);
+    match flight_status_request.status(){
+        StatusCode::OK => return Ok(flight_status_request),
+        StatusCode::BAD_REQUEST => return Err("Please try again".to_string()),
+        StatusCode::INTERNAL_SERVER_ERROR => {
+            return Err("An error occurred on AeroBox server, please try again".to_string())
+        }
+        _ => {
+            println!("response from base is {:?}", flight_status_request);
+            return Ok(flight_status_request);
+        }
+    }
 }
