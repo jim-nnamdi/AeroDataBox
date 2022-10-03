@@ -1,5 +1,5 @@
 
-    use chrono::{DateTime, Local};
+    use chrono::{DateTime, Local, NaiveDateTime};
 
     use reqwest::{self};
     use serde::{Serialize, Deserialize};
@@ -48,10 +48,10 @@
     #[derive(Debug, Serialize, Deserialize)]
     pub struct Arrival {
         #[serde(rename="actualTimeLocal")]
-        pub actual_time_local: Option<DateTime<Local>>,
+        pub actual_time_local: NaiveDateTime,
 
         #[serde(rename="actualTimeUTC")]
-        pub actual_time_utc : Option<DateTime<Local>>,
+        pub actual_time_utc : NaiveDateTime,
 
         pub airport: Airport,
 
@@ -61,10 +61,10 @@
         pub  quality:Vec<Quality>,
 
         #[serde(rename="scheduledTimeLocal")]
-        pub scheduled_time_local: Option<DateTime<Local>>,
+        pub scheduled_time_local: NaiveDateTime,
 
         #[serde(rename="scheduledTimeUTC")]
-        pub  scheduled_time_utc: Option<DateTime<Local>>,
+        pub  scheduled_time_utc: NaiveDateTime,
         pub terminal: String,
     }
 
