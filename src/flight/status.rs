@@ -89,8 +89,8 @@
     #[tokio::main]
     pub async fn flight_information() -> Result<(), reqwest::Error>{
 
-        const API_KEY: &str = "53fd0041f2msh8c3ffa5b5508be0p152202jsn9a0f742df4a8";
-        const API_HOST : &str = "aerodatabox.p.rapidapi.com";
+        const API_KEY: &str = "APIKEY";
+        const API_HOST : &str = "APIHOST";
 
         let aerobox_client = reqwest::Client::new();
 
