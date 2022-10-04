@@ -1,6 +1,6 @@
 # AeroBox Data
 
-> Dynamic checks for Flight data: i'm using a free plan so this API is limited to some functionalities. still work in progress
+> Dynamic checks for Flight data: i'm using a free plan so this API is limited to some functionalities. 
 - [x] Generate flight status
 - [x] Retrieve flight departures information
 - [ ] Retrieve flight delays by statistics No

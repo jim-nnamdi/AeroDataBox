@@ -1,4 +1,4 @@
-use serde::{Serialize, Deserialize};
+use serde::{ Serialize, Deserialize };
 use reqwest::Error;
 
 pub const API_KEY: &str = "APIKEY";
@@ -27,5 +27,21 @@ impl<T> Departures<T> {
         println!("{:#?}", flight_departure_dates);
 
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_can_retrieve_departures() -> Result<(), Error> {
+        let result = Departures::<String>::flight_departure_dates();
+        match result {
+            Err(e) => {
+                Err(e)
+            }
+            _ => Ok(()),
+        }
     }
 }

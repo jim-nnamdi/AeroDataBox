@@ -1,6 +1,6 @@
 use chrono::{ NaiveDateTime };
 
-use reqwest::{ self };
+use reqwest::{ self, Error };
 use serde::{ Serialize, Deserialize };
 
 /// Declare module variables to be used
@@ -89,10 +89,9 @@ pub struct FlightData {
     pub status: String,
 }
 
-
 impl FlightData {
     #[tokio::main]
-    pub async fn flight_information() -> Result<(), reqwest::Error> {
+    pub async fn flight_information() -> Result<(), Error> {
         const API_URL: &str = "https://aerodatabox.p.rapidapi.com/flights/number/KL1395/2022-09-30";
 
         let aerobox_client = reqwest::Client::new();
@@ -106,5 +105,21 @@ impl FlightData {
 
         println!("{:#?}", flight_status_request);
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_can_retrieve_flight_information() -> Result<(), Error> {
+      let result = FlightData::flight_information();
+      match result {
+         Err(e) => {
+            Err(e)
+         }
+         _ => Ok(()),
+      }
     }
 }
