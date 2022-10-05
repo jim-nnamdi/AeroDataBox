@@ -1,8 +1,7 @@
 use reqwest::{ self, Error };
-use serde::{Serialize, Deserialize};
+use serde::{ Serialize, Deserialize };
+use dotenv::dotenv;
 
-pub const API_KEY: &str = "APIKEY";
-pub const API_HOST: &str = "APIHOST";
 pub const BASE_URL: &str = "https://aerodatabox.p.rapidapi.com/airports/%7BcodeType%7D/DME";
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -66,11 +65,12 @@ pub struct AirportData {
 impl AirportData {
     #[tokio::main]
     pub async fn get_airport_by_code() -> Result<(), Error> {
+        dotenv().ok();
         let client = reqwest::Client::new();
         let airport_data: AirportData = client
             .get(BASE_URL)
-            .header("X-RapidAPI-Key", API_KEY)
-            .header("X-RapidAPI-Host", API_HOST)
+            .header("X-RapidAPI-Key", std::env::var("APIKEY").expect("api key is required"))
+            .header("X-RapidAPI-Host", std::env::var("APIHOST").expect("please cross check the host"))
             .send().await?
             .json().await?;
 

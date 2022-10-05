@@ -1,8 +1,7 @@
 use reqwest::{self,Error};
 use serde::{Serialize, Deserialize};
+use dotenv::dotenv;
 
-pub const API_KEY: &str = "APIKEY";
-pub const API_HOST: &str = "APIHOST";
 pub const BASE_URL: &str ="https://aerodatabox.p.rapidapi.com/airports/%7BcodeType%7D/LHR/distance-time/LAX";
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -58,10 +57,11 @@ impl Distance{
 
     #[tokio::main]
     pub async fn distance_between_two_airport_flights() -> Result<Distance,Error> {
+        dotenv().ok();
         let client = reqwest::Client::new();
         let distance_data = client.get(BASE_URL)
-        .header("X-RapidAPI-Key", API_KEY)
-        .header("X-RapidAPI-Host", API_HOST)
+        .header("X-RapidAPI-Key", std::env::var("APIKEY").expect("api key is required"))
+            .header("X-RapidAPI-Host", std::env::var("APIHOST").expect("please cross check the host"))
         .send().await
         .expect("retrieving distance ...")
         .json::<Distance>().await;

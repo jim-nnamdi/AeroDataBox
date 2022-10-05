@@ -1,8 +1,6 @@
 use serde::{ Serialize, Deserialize };
 use reqwest::Error;
-
-pub const API_KEY: &str = "APIKEY";
-pub const API_HOST: &str = "APIHOST";
+use dotenv::dotenv;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Departures<T> {
@@ -12,6 +10,7 @@ pub struct Departures<T> {
 impl<T> Departures<T> {
     #[tokio::main]
     pub async fn flight_departure_dates() -> Result<(), Error> {
+        dotenv().ok();
         const BASE_URL: &str =
             "https://aerodatabox.p.rapidapi.com/flights/number/KL1395/dates/2020-06-01/2020-06-15";
 
@@ -19,8 +18,8 @@ impl<T> Departures<T> {
 
         let flight_departure_dates: Vec<Departures<String>> = aerobox_client
             .get(BASE_URL)
-            .header("X-RapidAPI-Key", API_KEY)
-            .header("X-RapidAPI-Host", API_HOST)
+            .header("X-RapidAPI-Key", std::env::var("APIKEY").expect("api key is required"))
+            .header("X-RapidAPI-Host", std::env::var("APIHOST").expect("please cross check the host"))
             .send().await?
             .json().await?;
 
