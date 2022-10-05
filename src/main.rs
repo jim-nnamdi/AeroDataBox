@@ -1,6 +1,7 @@
 #![allow(non_snake_case)]
 
 mod flight;
+mod airport;
 
 fn main(){
 
@@ -16,5 +17,18 @@ fn main(){
     match flight_departures_information {
         Err(e) => println!("{:?}",e),
         _ => (),
+    }
+
+    // get airport information by airport code
+    let airport_by_code = airport::Airport::get_airport_data_by_code();
+    match airport_by_code {
+        Err(e) => println!("{:?}", e),
+        _ => ()
+    }
+
+    // get distance between connecting flights
+    let distance_of_connecting_flights = airport::Airport::get_distance_between_two_flights();
+    if distance_of_connecting_flights.is_ok(){
+        println!("{:#?}",distance_of_connecting_flights);
     }
 }

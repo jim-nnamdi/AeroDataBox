@@ -7,6 +7,7 @@ use serde::{ Serialize, Deserialize };
 
 pub const API_KEY: &str = "APIKEY";
 pub const API_HOST: &str = "APIHOST";
+pub const API_URL: &str = "https://aerodatabox.p.rapidapi.com/flights/number/KL1395/2022-09-30";
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Aircraft {
@@ -92,8 +93,6 @@ pub struct FlightData {
 impl FlightData {
     #[tokio::main]
     pub async fn flight_information() -> Result<(), Error> {
-        const API_URL: &str = "https://aerodatabox.p.rapidapi.com/flights/number/KL1395/2022-09-30";
-
         let aerobox_client = reqwest::Client::new();
 
         let flight_status_request: Vec<FlightData> = aerobox_client

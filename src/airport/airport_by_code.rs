@@ -1,9 +1,14 @@
 use reqwest::{ self, Error };
+use serde::{Serialize, Deserialize};
+
+pub const API_KEY: &str = "APIKEY";
+pub const API_HOST: &str = "APIHOST";
+pub const BASE_URL: &str = "https://aerodatabox.p.rapidapi.com/airports/%7BcodeType%7D/DME";
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Country {
-    code: String,
-    name: String,
+    pub code: String,
+    pub name: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -14,48 +19,62 @@ pub struct Location {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Continent {
-    code: String,
-    name: String,
+    pub code: String,
+    pub name: String,
 
     #[serde(rename = "timeZone")]
-    timezone: String,
+    pub timezone: String,
 }
 
 #[derive(Serialize, Debug, Deserialize)]
 pub struct Urls {
     #[serde(rename = "webSite")]
-    website: String,
+    pub website: String,
 
-    wikipedia: String,
-    twitter: String,
+    pub wikipedia: String,
+    pub twitter: String,
 
     #[serde(rename = "googleMaps")]
-    googlemaps: String,
+    pub googlemaps: String,
 
     #[serde(rename = "flightRadar")]
-    flightradar: String,
+    pub flightradar: String,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct AirportData {
-    icao: String,
-    iata: String,
+    pub icao: String,
+    pub iata: String,
 
     #[serde(rename = "localCode")]
-    localcode: String,
+    pub localcode: String,
 
     #[serde(rename = "shortName")]
-    shortname: String,
+    pub shortname: String,
 
     #[serde(rename = "fullName")]
-    fullname: String,
+    pub fullname: String,
 
     #[serde(rename = "muncipalityName")]
-    muncipalityname: String,
-    location: Location,
-    country: Country,
-    continent: Continent,
-    urls: Urls,
+    pub muncipalityname: String,
+    pub location: Location,
+    pub country: Country,
+    pub continent: Continent,
+    pub urls: Urls,
 }
 
-pub fn get_airport_by_code() -> Result<(), Error> {}
+impl AirportData {
+    #[tokio::main]
+    pub async fn get_airport_by_code() -> Result<(), Error> {
+        let client = reqwest::Client::new();
+        let airport_data: AirportData = client
+            .get(BASE_URL)
+            .header("X-RapidAPI-Key", API_KEY)
+            .header("X-RapidAPI-Host", API_HOST)
+            .send().await?
+            .json().await?;
+
+        println!("{:#?}", airport_data);
+        Ok(())
+    }
+}
